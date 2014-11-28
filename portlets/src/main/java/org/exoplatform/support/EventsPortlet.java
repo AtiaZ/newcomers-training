@@ -6,6 +6,8 @@ package org.exoplatform.support;
  * @author <a href="mailto:marwen.trabelsi.insat@gmail.com">Marwen Trabelsi</a>
  */
 
+import org.exoplatform.container.ExoContainerContext;
+
 import javax.portlet.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,13 +22,15 @@ public class EventsPortlet extends GenericPortlet
 
     private EventRepoService repoService;
 
+    private EventCRUDService eventCRUDService;
+
     List eventlist;
 
 
     public void doView(RenderRequest request, RenderResponse response)
             throws PortletException, IOException
     {
-       eventlist=repoService.getAllEvents();
+       eventlist=eventCRUDService.list();
        request.setAttribute("eventList",eventlist);
         initialView.include(request, response);
     }
@@ -35,7 +39,8 @@ public class EventsPortlet extends GenericPortlet
     public void init(PortletConfig config) throws PortletException
     {
         super.init(config);
-        repoService = new EventRepoService();
+//        repoService = new EventRepoService();
+        eventCRUDService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(EventCRUDService.class);
         initialView = config.getPortletContext().getRequestDispatcher(INITIAL_VIEW);
     }
 
@@ -46,8 +51,7 @@ public class EventsPortlet extends GenericPortlet
         String name = request.getParameter("event-name");
         String date = request.getParameter("event-date");
 
-
-        repoService.createEvent(name, date);
+        eventCRUDService.create(name, date);
 
         response.setPortletMode(PortletMode.VIEW);
     }
