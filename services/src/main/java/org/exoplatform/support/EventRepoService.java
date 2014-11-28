@@ -7,9 +7,13 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by exo on 11/27/14.
@@ -45,24 +49,56 @@ public class EventRepoService {
             session.save();
 
         } catch (RepositoryException e) {
-            e.printStackTrace(); //TODO
+            LOG.error("An error occurred while opening the session ", e);
         }
     }
 
+    public  List<EventBean> getAllEvents() {
+
+        Session session = initSession();
+
+        List<EventBean> events= new ArrayList();
+
+        try {
+            Node rootNode = session.getRootNode();
+            Node eventHomeNode = null;
+
+            if (rootNode.hasNode(EVENT_HOME)) {
+                eventHomeNode = rootNode.getNode(EVENT_HOME);
+            } else {
+                eventHomeNode = rootNode.addNode(EVENT_HOME);
+            }
+
+            NodeIterator eventNodesIterator = eventHomeNode.getNodes();
+
+            while (eventNodesIterator.hasNext())
+            {
+                Node node = eventNodesIterator.nextNode();
+                String name = node.getProperty(EVENT_NAME_PROP).getString();
+                String date = node.getProperty(EVENT_DATE_PROP).getString();
+                EventBean eventBean = new EventBean(name, date);
+                events.add(eventBean);
+            }
+
+
+        } catch (RepositoryException e) {
+            LOG.error("An error occurred while opening the session ", e);
+        }
+
+        return events;
+    }
+
+
+
     private Session initSession() {
         RepositoryService repositoryService = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(RepositoryService.class);
-        SessionProvider sessionProvider = ExoContainerContext.getCurrentContainer().getComponentInstanceOfType(SessionProvider.class);
         ManageableRepository manageableRepository = null;
+        Session session = null;
         try {
             manageableRepository = repositoryService.getCurrentRepository();
 //            manageableRepository = repositoryService.getRepository("repository");
-        } catch (RepositoryException e) {
-            LOG.error("An error occurred while retrieving the repository ", e);
-        }
 
-        Session session = null;
-        try {
-            session = sessionProvider.getSession(WORKSPACE, manageableRepository);
+            session = manageableRepository.getSystemSession(WORKSPACE);
         } catch (RepositoryException e) {
             LOG.error("An error occurred while retrieving the repository ", e);
         }

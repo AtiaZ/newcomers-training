@@ -20,12 +20,14 @@ public class EventsPortlet extends GenericPortlet
 
     private EventRepoService repoService;
 
-    List<EventBean> eventList = new ArrayList<EventBean>();
+    List eventlist;
+
 
     public void doView(RenderRequest request, RenderResponse response)
             throws PortletException, IOException
     {
-        request.setAttribute("eventList",eventList);
+       eventlist=repoService.getAllEvents();
+       request.setAttribute("eventList",eventlist);
         initialView.include(request, response);
     }
 
@@ -33,6 +35,7 @@ public class EventsPortlet extends GenericPortlet
     public void init(PortletConfig config) throws PortletException
     {
         super.init(config);
+        repoService = new EventRepoService();
         initialView = config.getPortletContext().getRequestDispatcher(INITIAL_VIEW);
     }
 
@@ -42,18 +45,9 @@ public class EventsPortlet extends GenericPortlet
 
         String name = request.getParameter("event-name");
         String date = request.getParameter("event-date");
-//        eventList.add(new EventBean(name,date));
 
-        repoService = new EventRepoService();
+
         repoService.createEvent(name, date);
-
-
-
-        /*PortletPreferences prefs=request.getPreferences();
-        prefs.setValue("event-name",name);
-        prefs.setValue("event-date",date);
-        prefs.store();*/
-        //request.getPortletSession().setAttribute(" eventList", eventList);
 
         response.setPortletMode(PortletMode.VIEW);
     }
