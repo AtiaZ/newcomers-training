@@ -19,4 +19,7 @@ target/
 *.iml
 .idea/
 
+# Module
+module_main.xml
+
 

@@ -12,6 +12,21 @@
   <packaging>jar</packaging>
   <name>Core Container Services</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.exoplatform.jcr</groupId>
+            <artifactId>exo.jcr.component.core</artifactId>
+            <version>1.16.0-GA</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.exoplatform.jcr</groupId>
+            <artifactId>exo.jcr.component.ext</artifactId>
+            <version>1.16.0-GA</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
   <build>
     <finalName>${project.parent.artifactId}-${project.artifactId}</finalName>
   </build>
